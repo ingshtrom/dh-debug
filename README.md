@@ -19,8 +19,6 @@ can modify as you wish, but the tests included in `dh-config.json` are what we r
 
 Run a debug test suite using `dh-debug` or `sudo dh-debug` (see the note above about using sudo). 
 
-If shipping to a Docker employee or someone else to look at, run `dh-debug --compress` and send the tar gzipped file to them.
-
 `dh-debug -s` can print some really basic, high-level metrics of tests run and their exit codes or
 errors encountered. 
 

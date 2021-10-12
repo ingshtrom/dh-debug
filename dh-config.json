@@ -1,5 +1,4 @@
 {
-  "should_test_docker_pull": true,
   "shell_tests": [
     {
       "name": "Docker Hub DNS A",
