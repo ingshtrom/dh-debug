@@ -1,140 +1,218 @@
-[
-  {
-    "name": "Docker Hub DNS A",
-    "command": "dig",
-    "arguments": [
-      "hub.docker.com",
-      "A"
-    ]
-  },
-  {
-    "name": "Docker Hub DNS AAAA",
-    "command": "dig",
-    "arguments": [
-      "hub.docker.com",
-      "AAAA"
-    ]
-  },
-  {
-    "name": "Docker Registry DNS A",
-    "command": "dig",
-    "arguments": [
-      "registry-1.docker.io",
-      "A"
-    ]
-  },
-  {
-    "name": "Docker Registry DNS AAAA",
-    "command": "dig",
-    "arguments": [
-      "registry-1.docker.io",
-      "AAAA"
-    ]
-  },
-  {
-    "name": "Docker Registry Auth DNS A",
-    "command": "dig",
-    "arguments": [
-      "auth.docker.io",
-      "A"
-    ]
-  },
-  {
-    "name": "Docker Registry Auth DNS AAAA",
-    "command": "dig",
-    "arguments": [
-      "auth.docker.io",
-      "AAAA"
-    ]
-  },
-  {
-    "name": "Cloudflare DNS A",
-    "command": "dig",
-    "arguments": [
-      "production.cloudflare.docker.com",
-      "A"
-    ]
-  },
-  {
-    "name": "Cloudflare DNS AAAA",
-    "command": "dig",
-    "arguments": [
-      "production.cloudflare.docker.com",
-      "AAAA"
-    ]
-  },
-  {
-    "name": "Docker Registry IPv4",
-    "command": "curl",
-    "arguments": [
-      "-4svo /dev/null https://registry-1.docker.io/"
-    ]
-  },
-  {
-    "name": "Docker Registry IPv6",
-    "command": "curl",
-    "arguments": [
-      "-6svo /dev/null https://registry-1.docker.io/"
-    ]
-  },
-  {
-    "name": "Docker Hub IPv4",
-    "command": "curl",
-    "arguments": [
-      "-4svo /dev/null https://hub.docker.com/"
-    ]
-  },
-  {
-    "name": "Docker Hub IPv6",
-    "command": "curl",
-    "arguments": [
-      "-6svo /dev/null https://hub.docker.com/"
-    ]
-  },
-  {
-    "name": "Docker Registry Auth IPv4",
-    "command": "curl",
-    "arguments": [
-      "-4svo", "/dev/null", "https://auth.docker.io/"
-    ]
-  },
-  {
-    "name": "Docker Registry Auth IPv6",
-    "command": "curl",
-    "arguments": [
-      "-6svo", "/dev/null", "https://auth.docker.io/"
-    ]
-  },
-  {
-    "name": "Cloudflare IPv4",
-    "command": "curl",
-    "arguments": [
-      "-4svo", "/dev/null", "https://production.cloudflare.docker.com/"
-    ]
-  },
-  {
-    "name": "Cloudflare IPv6",
-    "command": "curl",
-    "arguments": [
-      "-6svo",
-      "/dev/null",
-      "https://production.cloudflare.docker.com/"
-    ]
-  },
-  {
-    "name": "Cloudflare Trace IPv4",
-    "command": "curl",
-    "arguments": [
-      "-4sv",
-      "http://production.cloudflare.docker.com/cdn-cgi/trace"
-    ]
-  },
-  {
-    "name": "Cloudflare Trace IPv4",
-    "command": "curl",
-    "arguments": [
-      "-6sv",
-      "http://production.cloudflare.docker.com/cdn-cgi/trace"
-    ]
-  }
-]
+{
+  "should_test_docker_pull": true,
+  "shell_tests": [
+    {
+      "name": "Docker Hub DNS A",
+      "command": "dig",
+      "arguments": [
+        "hub.docker.com",
+        "A"
+      ]
+    },
+    {
+      "name": "Docker Hub DNS AAAA",
+      "command": "dig",
+      "arguments": [
+        "hub.docker.com",
+        "AAAA"
+      ]
+    },
+    {
+      "name": "Docker Registry DNS A",
+      "command": "dig",
+      "arguments": [
+        "registry-1.docker.io",
+        "A"
+      ]
+    },
+    {
+      "name": "Docker Registry DNS AAAA",
+      "command": "dig",
+      "arguments": [
+        "registry-1.docker.io",
+        "AAAA"
+      ]
+    },
+    {
+      "name": "Docker Registry Auth DNS A",
+      "command": "dig",
+      "arguments": [
+        "auth.docker.io",
+        "A"
+      ]
+    },
+    {
+      "name": "Docker Registry Auth DNS AAAA",
+      "command": "dig",
+      "arguments": [
+        "auth.docker.io",
+        "AAAA"
+      ]
+    },
+    {
+      "name": "Cloudflare DNS A",
+      "command": "dig",
+      "arguments": [
+        "production.cloudflare.docker.com",
+        "A"
+      ]
+    },
+    {
+      "name": "Cloudflare DNS AAAA",
+      "command": "dig",
+      "arguments": [
+        "production.cloudflare.docker.com",
+        "AAAA"
+      ]
+    },
+    {
+      "name": "Docker Registry IPv4",
+      "command": "curl",
+      "arguments": [
+        "-4svo",
+        "/dev/null",
+        "https://registry-1.docker.io/"
+      ]
+    },
+    {
+      "name": "Docker Registry IPv6",
+      "command": "curl",
+      "arguments": [
+        "-6svo",
+        "/dev/null",
+        "https://registry-1.docker.io/"
+      ]
+    },
+    {
+      "name": "Docker Hub IPv4",
+      "command": "curl",
+      "arguments": [
+        "-4svo",
+        "/dev/null",
+        "https://hub.docker.com/"
+      ]
+    },
+    {
+      "name": "Docker Hub IPv6",
+      "command": "curl",
+      "arguments": [
+        "-6svo",
+        "/dev/null",
+        "https://hub.docker.com/"
+      ]
+    },
+    {
+      "name": "Docker Registry Auth IPv4",
+      "command": "curl",
+      "arguments": [
+        "-4svo",
+        "/dev/null",
+        "https://auth.docker.io/"
+      ]
+    },
+    {
+      "name": "Docker Registry Auth IPv6",
+      "command": "curl",
+      "arguments": [
+        "-6svo",
+        "/dev/null",
+        "https://auth.docker.io/"
+      ]
+    },
+    {
+      "name": "Cloudflare IPv4",
+      "command": "curl",
+      "arguments": [
+        "-4svo",
+        "/dev/null",
+        "https://production.cloudflare.docker.com/"
+      ]
+    },
+    {
+      "name": "Cloudflare IPv6",
+      "command": "curl",
+      "arguments": [
+        "-6svo",
+        "/dev/null",
+        "https://production.cloudflare.docker.com/"
+      ]
+    },
+    {
+      "name": "Cloudflare Trace IPv4",
+      "command": "curl",
+      "arguments": [
+        "-4sv",
+        "https://production.cloudflare.docker.com/cdn-cgi/trace"
+      ]
+    },
+    {
+      "name": "Cloudflare Trace IPv6",
+      "command": "curl",
+      "arguments": [
+        "-6sv",
+        "https://production.cloudflare.docker.com/cdn-cgi/trace"
+      ]
+    },
+    {
+      "name": "Docker Regsitry MTR (requires sudo)",
+      "command": "mtr",
+      "arguments": [
+        "registry-1.docker.io",
+        "--report",
+        "--gracetime",
+        "15",
+        "--tcp"
+      ]
+    },
+    {
+      "name": "Cloudflare MTR (requires sudo)",
+      "command": "mtr",
+      "arguments": [
+        "production.cloudflare.docker.com",
+        "--report",
+        "--gracetime",
+        "15",
+        "--tcp"
+      ]
+    },
+    {
+      "name": "Docker Regsitry Traceroute",
+      "command": "traceroute",
+      "arguments": [
+        "registry-1.docker.io"
+      ]
+    },
+    {
+      "name": "Cloudflare Traceroute",
+      "command": "traceroute",
+      "arguments": [
+        "production.cloudflare.docker.com"
+      ]
+    },
+    {
+      "name": "HTTP Proxy Env Vars",
+      "command": "env",
+      "filter": "proxy"
+    },
+    {
+      "name": "Network Interfaces",
+      "command": "ifconfig"
+    },
+    {
+      "name": "Docker Daemon Process",
+      "command": "ps",
+      "arguments": [
+        "aux"
+      ],
+      "filter": "dockerd"
+    },
+    {
+      "name": "Docker Hub Registry Rate Limit Get Headers",
+      "command": "curl",
+      "arguments": [
+        "-sSLI",
+        "https://registry-1.docker.io/v2/ratelimitpreview/test/manifests/latest"
+      ]
+    }
+  ]
+}

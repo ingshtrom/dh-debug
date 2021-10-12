@@ -12,7 +12,7 @@ var (
 	configFile    string
 	debugFile    string
 	isDebug     bool
-	isParse bool
+	isSummarize bool
 	isPrint bool
 )
 
@@ -27,7 +27,7 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		if !isDebug && !isParse && !isPrint {
+		if !isDebug && !isSummarize && !isPrint {
 			isDebug = true
 		}
 
@@ -35,6 +35,8 @@ var rootCmd = &cobra.Command{
 			pkg.RunDebugTests(configFile, debugFile)
 		} else if isPrint {
 			pkg.PrintDebugTests(debugFile)
+		} else if isSummarize {
+			pkg.SummarizeTestResults(debugFile)
 		}
 	},
 }
@@ -45,7 +47,7 @@ func Execute() {
 	rootCmd.Flags().StringVarP(&configFile, "config", "c", "./dh-config.json", "File to read test declarations from.")
 	rootCmd.Flags().StringVarP(&debugFile, "file", "f", "./dh-debug.json", "File to write runs to or read runs from.")
 	rootCmd.Flags().BoolVarP(&isDebug, "debug", "d", false, "(default) Whether to debug the network to Docker Hub.")
-	//rootCmd.Flags().BoolVar(&isParse, "parse", false, "Parse the output file from a debug run. Creates a new file with more information in it.")
+	rootCmd.Flags().BoolVarP(&isSummarize, "summarize", "s", false, "Summarize some of the information in the output.")
 	rootCmd.Flags().BoolVarP(&isPrint, "print", "p", false, "Human readable print of the output file from a debug or parse run.")
 
 	if err := rootCmd.Execute(); err != nil {

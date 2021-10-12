@@ -1,8 +1,11 @@
-@PHONY: run
-run: 
-	@go generate ./... -n -v -x
+.PHONY: build
+build:
+	CGO_ENABLED=0 go build -o ./bin/dh-debug main.go && \
+	chmod +x ./bin/dh-debug
 
-	@export GOOS=linux
-	@export CGO_ENABLED=0
 
-	@go build -o main main.go
+.PHONY: test
+test:
+	go test ./...
+
+

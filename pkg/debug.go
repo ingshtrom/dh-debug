@@ -1,11 +1,14 @@
 package pkg
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
+	"strings"
+	"time"
 
 	"github.com/ingshtrom/dh-debug/pkg/types"
 )
@@ -17,117 +20,16 @@ func RunDebugTests(configFile, filePath string) {
 		os.Exit(1)
 	}
 
-	var dcs *[]types.DebugCommand
-	err = json.Unmarshal(rawDCS, &dcs)
+	var config *types.Config
+	err = json.Unmarshal(rawDCS, &config)
 	if err != nil {
 		fmt.Printf("error parsing config file: %v", err)
 		os.Exit(1)
 	}
 
-	//dcs := []types.DebugCommand{
-	//  // DNS
-	//  {
-	//    Name:      "Docker Hub DNS A",
-	//    Command:   "dig",
-	//    Arguments: []string{"hub.docker.com", "A"},
-	//  },
-	//  {
-	//    Name:      "Docker Hub DNS AAAA",
-	//    Command:   "dig",
-	//    Arguments: []string{"hub.docker.com", "AAAA"},
-	//  },
-	//  {
-	//    Name:      "Docker Registry DNS A",
-	//    Command:   "dig",
-	//    Arguments: []string{"registry-1.docker.io", "A"},
-	//  },
-	//  {
-	//    Name:      "Docker Registry DNS AAAA",
-	//    Command:   "dig",
-	//    Arguments: []string{"registry-1.docker.io", "AAAA"},
-	//  },
-	//  {
-	//    Name:      "Docker Registry Auth DNS A",
-	//    Command:   "dig",
-	//    Arguments: []string{"auth.docker.io", "A"},
-	//  },
-	//  {
-	//    Name:      "Docker Registry Auth DNS AAAA",
-	//    Command:   "dig",
-	//    Arguments: []string{"auth.docker.io", "AAAA"},
-	//  },
-	//  {
-	//    Name:      "Cloudflare DNS A",
-	//    Command:   "dig",
-	//    Arguments: []string{"production.cloudflare.docker.com", "A"},
-	//  },
-	//  {
-	//    Name:      "Cloudflare DNS AAAA",
-	//    Command:   "dig",
-	//    Arguments: []string{"production.cloudflare.docker.com", "AAAA"},
-	//  },
-
-	//  // CURL
-	//  {
-	//    Name:      "Docker Registry IPv4",
-	//    Command:   "curl",
-	//    Arguments: []string{"-4svo /dev/null https://registry-1.docker.io/"},
-	//  },
-	//  {
-	//    Name:      "Docker Registry IPv6",
-	//    Command:   "curl",
-	//    Arguments: []string{"-6svo /dev/null https://registry-1.docker.io/"},
-	//  },
-	//  {
-	//    Name:      "Docker Hub IPv4",
-	//    Command:   "curl",
-	//    Arguments: []string{"-4svo /dev/null https://hub.docker.com/"},
-	//  },
-	//  {
-	//    Name:      "Docker Hub IPv6",
-	//    Command:   "curl",
-	//    Arguments: []string{"-6svo /dev/null https://hub.docker.com/"},
-	//  },
-	//  {
-	//    Name:      "Docker Registry Auth IPv4",
-	//    Command:   "curl",
-	//    Arguments: []string{"-4svo /dev/null https://auth.docker.io/"},
-	//  },
-	//  {
-	//    Name:      "Docker Registry Auth IPv6",
-	//    Command:   "curl",
-	//    Arguments: []string{"-6svo /dev/null https://auth.docker.io/"},
-	//  },
-	//  {
-	//    Name:      "Cloudflare IPv4",
-	//    Command:   "curl",
-	//    Arguments: []string{"-4svo /dev/null https://production.cloudflare.docker.com/"},
-	//  },
-	//  {
-	//    Name:      "Cloudflare IPv6",
-	//    Command:   "curl",
-	//    Arguments: []string{"-6svo", "/dev/null", "https://production.cloudflare.docker.com/"},
-	//  },
-
-
-	//  // Cloudflare Trace
-	//  {
-	//    Name: "Cloudflare Trace IPv4",
-	//    Command: "curl",
-	//    Arguments: []string{"-4sv", "http://production.cloudflare.docker.com/cdn-cgi/trace"},
-
-	//  },
-	//  {
-	//    Name: "Cloudflare Trace IPv4",
-	//    Command: "curl",
-	//    Arguments: []string{"-6sv", "http://production.cloudflare.docker.com/cdn-cgi/trace", },
-
-	//  },
-	//}
-
 	out := make([]types.DebugCommand, 0)
 
-	for _, dc := range *dcs {
+	for _, dc := range *&config.ShellTests {
 		out = append(out, runCommand(dc))
 	}
 
@@ -135,37 +37,24 @@ func RunDebugTests(configFile, filePath string) {
 }
 
 func runCommand(dc types.DebugCommand) types.DebugCommand {
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
 	dc = addExtraArgs(dc)
-	cmd := exec.Command(dc.Command, dc.Arguments...)
+	cmd := exec.CommandContext(ctx, dc.Command, dc.Arguments...)
 
-	stdout, err := cmd.StdoutPipe()
+	fmt.Printf("$ %s %s ...", dc.Command, strings.ReplaceAll(strings.Join(dc.Arguments, " "), "\n", "\\n"))
+
+	var stdout bytes.Buffer
+	cmd.Stdout = &stdout
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	err := cmd.Start()
 	if err != nil {
 		dc.Errors = append(dc.Errors, err.Error())
-	}
-
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		dc.Errors = append(dc.Errors, err.Error())
-	}
-
-	err = cmd.Start()
-	if err != nil {
-		dc.Errors = append(dc.Errors, err.Error())
+		fmt.Printf("❌ Failed to Run\n")
 		return dc
-	}
-
-	slurpOut, err := io.ReadAll(stdout)
-	if err != nil {
-		dc.Errors = append(dc.Errors, err.Error())
-	} else {
-		dc.StdOut = string(slurpOut)
-	}
-
-	slurpErr, err := io.ReadAll(stderr)
-	if err != nil {
-		dc.Errors = append(dc.Errors, err.Error())
-	} else {
-		dc.StdErr = string(slurpErr)
 	}
 
 	err = cmd.Wait()
@@ -174,8 +63,34 @@ func runCommand(dc types.DebugCommand) types.DebugCommand {
 	}
 
 	dc.ExitCode = cmd.ProcessState.ExitCode()
+	dc.StdErr = string(stderr.Bytes())
+
+	stdoutData := string(stdout.Bytes())
+	if dc.Filter != "" {
+		stdoutData = grepFilter(stdoutData, dc.Filter)
+	}
+	dc.StdOut = stdoutData
+
+	if ctx.Err() == context.DeadlineExceeded {
+		dc.Errors = append(dc.Errors, ctx.Err().Error())
+		fmt.Printf("❌ Timeout\n")
+		return dc
+	}
+
+	fmt.Printf("✅\n")
 
 	return dc
+}
+
+func grepFilter(stdout, filter string) string {
+	lines := strings.Split(stdout, "\n")
+	linesToKeep := make([]string, 0)
+	for _, l := range lines {
+		if strings.Contains(strings.ToLower(l), filter) {
+			linesToKeep = append(linesToKeep, l)
+		}
+	}
+	return strings.Join(linesToKeep, "\n")
 }
 
 func addExtraArgs(dc types.DebugCommand) types.DebugCommand {
