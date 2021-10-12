@@ -20,9 +20,7 @@ jobs:
         with:
           go-version: 1.17
 
-      - name: Go clean
-        run: |
-          go clean -modcache
+      
 
       - name: Bump version and push tag
         id: tag_version
@@ -31,6 +29,11 @@ jobs:
           release_branches: main
           default_bump: major
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Go clean and fetch latest tags
+        run: |
+          go clean -modcache
+          git fetch origin --tags
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
