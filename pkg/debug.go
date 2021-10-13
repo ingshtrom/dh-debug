@@ -13,20 +13,7 @@ import (
 	"github.com/ingshtrom/dh-debug/pkg/types"
 )
 
-func RunDebugTests(configFile, filePath string) {
-	rawDCS, err := os.ReadFile(configFile)
-	if err != nil {
-		fmt.Printf("error reading config file: %v", err)
-		os.Exit(1)
-	}
-
-	var config *types.Config
-	err = json.Unmarshal(rawDCS, &config)
-	if err != nil {
-		fmt.Printf("error parsing config file: %v", err)
-		os.Exit(1)
-	}
-
+func RunDebugTests(config *types.Config, filePath string) {
 	out := make([]types.DebugCommand, 0)
 
 	for _, dc := range *&config.ShellTests {
@@ -41,7 +28,7 @@ func runCommand(dc types.DebugCommand) types.DebugCommand {
 	defer cancel()
 
 	dc = addExtraArgs(dc)
-	cmd := exec.CommandContext(ctx, dc.Command, dc.Arguments...)
+	cmd := exec.CommandContext(ctx, dc.Command, append(dc.Arguments, dc.ExtraArguments...)...)
 
 	fmt.Printf("$ %s %s ...", dc.Command, strings.ReplaceAll(strings.Join(dc.Arguments, " "), "\n", "\\n"))
 
@@ -95,7 +82,7 @@ func grepFilter(stdout, filter string) string {
 
 func addExtraArgs(dc types.DebugCommand) types.DebugCommand {
 	if dc.Command == "curl" {
-		dc.Arguments = append(dc.Arguments, "-w \"Content Type: %{content_type} \nHTTP Code: %{http_code} \nHTTP Connect:%{http_connect} \nNumber Connects: %{num_connects} \nNumber Redirects: %{num_redirects} \nRedirect URL: %{redirect_url} \nSize Download: %{size_download} \nSize Upload: %{size_upload} \nSSL Verify: %{ssl_verify_result} \nTime Handshake: %{time_appconnect} \nTime Connect: %{time_connect} \nName Lookup Time: %{time_namelookup} \nTime Pretransfer: %{time_pretransfer} \nTime Redirect: %{time_redirect} \nTime Start Transfer: %{time_starttransfer} \nTime Total: %{time_total} \nEffective URL: %{url_effective}\"")
+		dc.ExtraArguments = []string{"-L", "-w", "\"HTTP Connect:%{http_connect} \nNumber Connects: %{num_connects} \nNumber Redirects: %{num_redirects} \nRedirect URL: %{redirect_url} \nSize Download: %{size_download} \nSize Upload: %{size_upload} \nSSL Verify: %{ssl_verify_result} \nTime Handshake: %{time_appconnect} \nTime Connect: %{time_connect} \nName Lookup Time: %{time_namelookup} \nTime Pretransfer: %{time_pretransfer} \nTime Redirect: %{time_redirect} \nTime Start Transfer: %{time_starttransfer} \nTime Total: %{time_total} \nEffective URL: %{url_effective}\""}
 	}
 
 	return dc

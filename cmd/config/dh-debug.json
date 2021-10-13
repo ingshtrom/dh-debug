@@ -1,5 +1,5 @@
 {
-  "shell_tests": [
+  "shellTests": [
     {
       "name": "Docker Hub DNS A",
       "command": "dig",
@@ -172,20 +172,6 @@
         "--gracetime",
         "15",
         "--tcp"
-      ]
-    },
-    {
-      "name": "Docker Regsitry Traceroute",
-      "command": "traceroute",
-      "arguments": [
-        "registry-1.docker.io"
-      ]
-    },
-    {
-      "name": "Cloudflare Traceroute",
-      "command": "traceroute",
-      "arguments": [
-        "production.cloudflare.docker.com"
       ]
     },
     {

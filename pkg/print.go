@@ -27,7 +27,7 @@ var funcs = template.FuncMap{
 var debugCommandTemplate = `
 {{ "------------------------------------------" | green }}
 ### {{ .Name | red }} ###
-  {{ "Command:" | red }} "{{ .Command }} {{ range $index, $element := .Arguments}}{{if $index}} {{end}}{{$element}}{{end}}"
+  {{ "Command:" | red }} "{{ .Command }} {{ range $index, $element := .Arguments}}{{if $index}} {{end}}{{$element}}{{end}} {{ range $index, $element := .ExtraArguments}}{{if $index}} {{end}}{{$element}}{{end}}"
   {{ "Filter:" | red }} "{{ .Filter }}"
   {{ "ExitCode:" | red }} {{ .ExitCode }}
   {{ "StdOut:" | red }}{{ .StdOut }}
@@ -36,10 +36,11 @@ var debugCommandTemplate = `
 {{ "------------------------------------------" | green }}
 `
 
-func PrintDebugTests(filePath string) {
-	data, err := os.ReadFile(filePath)
+func PrintDebugTests(testResultsFile string, errorsOnly bool) {
+	fmt.Println(testResultsFile, errorsOnly)
+	data, err := os.ReadFile(testResultsFile)
 	if err != nil {
-		fmt.Printf("error reading debug file: %v", err)
+		fmt.Printf("could not fine results file at %q\n", testResultsFile)
 		os.Exit(1)
 	}
 
@@ -47,26 +48,29 @@ func PrintDebugTests(filePath string) {
 
 	err = json.Unmarshal(data, &dcs)
 	if err != nil {
-		fmt.Printf("error parsing debug file: %v", err)
+		fmt.Println("error parsing debug file: ", err)
 		os.Exit(1)
 	}
 
 	for _, dc := range *dcs {
-		printDebugCommand(dc)
+		if !errorsOnly {
+			printDebugCommand(dc)
+		} else if dc.ExitCode != 0 || len(dc.Errors) > 0 {
+			printDebugCommand(dc)
+		}
 	}
 }
 
 func printDebugCommand(dc types.DebugCommand) {
 	t, err := template.New("DebugCommand").Funcs(funcs).Parse(debugCommandTemplate)
 	if err != nil {
-		fmt.Printf("error creating template: %v", err)
+		fmt.Println("error creating template: ", err)
 		os.Exit(1)
 	}
 	err = t.Execute(os.Stdout, dc)
 	if err != nil {
-		fmt.Printf("error executing template: %v", err)
+		fmt.Println("error executing template: ", err)
 		os.Exit(1)
 	}
 }
-
 
