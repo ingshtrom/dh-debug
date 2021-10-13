@@ -39,7 +39,7 @@ type SummarizeData struct {
 func SummarizeTestResults(testResultsFile string) {
 	data, err := os.ReadFile(testResultsFile)
 	if err != nil {
-		fmt.Printf("error reading debug file: %v", err)
+		fmt.Printf("could not fine results file at %q\n", testResultsFile)
 		os.Exit(1)
 	}
 
@@ -47,7 +47,7 @@ func SummarizeTestResults(testResultsFile string) {
 
 	err = json.Unmarshal(data, &dcs)
 	if err != nil {
-		fmt.Printf("error parsing debug file: %v", err)
+		fmt.Println("error parsing debug file: ", err)
 		os.Exit(1)
 	}
 
@@ -68,16 +68,14 @@ func SummarizeTestResults(testResultsFile string) {
 		}
 	}
 
-	fmt.Println(testSummary)
-
 	t, err := template.New("Summarize").Funcs(summarizeFuncs).Parse(summaryTemplate)
 	if err != nil {
-		fmt.Printf("error creating template: %v", err)
+		fmt.Println("error creating template: ", err)
 		os.Exit(1)
 	}
 	err = t.Execute(os.Stdout, testSummary)
 	if err != nil {
-		fmt.Printf("error executing template: %v", err)
+		fmt.Println("error executing template: ", err)
 		os.Exit(1)
 	}
 }

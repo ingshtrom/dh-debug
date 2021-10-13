@@ -70,6 +70,7 @@ func TestDebugAddExtraArgs(t *testing.T) {
 		Name           string
 		DebugCommand   types.DebugCommand
 		ExpectedArguments []string
+		ExpectedExtraArguments []string
 	}{
 		{
 			Name:   "Curl",
@@ -78,7 +79,8 @@ func TestDebugAddExtraArgs(t *testing.T) {
 				Command: "curl",
 				Arguments: []string{"-v"},
 			},
-			ExpectedArguments: []string{"-v", "-w \"Content Type: %{content_type} \nHTTP Code: %{http_code} \nHTTP Connect:%{http_connect} \nNumber Connects: %{num_connects} \nNumber Redirects: %{num_redirects} \nRedirect URL: %{redirect_url} \nSize Download: %{size_download} \nSize Upload: %{size_upload} \nSSL Verify: %{ssl_verify_result} \nTime Handshake: %{time_appconnect} \nTime Connect: %{time_connect} \nName Lookup Time: %{time_namelookup} \nTime Pretransfer: %{time_pretransfer} \nTime Redirect: %{time_redirect} \nTime Start Transfer: %{time_starttransfer} \nTime Total: %{time_total} \nEffective URL: %{url_effective}\""},
+			ExpectedArguments: []string{"-v"},
+			ExpectedExtraArguments: []string{"-L", "-w", "\"HTTP Connect:%{http_connect} \nNumber Connects: %{num_connects} \nNumber Redirects: %{num_redirects} \nRedirect URL: %{redirect_url} \nSize Download: %{size_download} \nSize Upload: %{size_upload} \nSSL Verify: %{ssl_verify_result} \nTime Handshake: %{time_appconnect} \nTime Connect: %{time_connect} \nName Lookup Time: %{time_namelookup} \nTime Pretransfer: %{time_pretransfer} \nTime Redirect: %{time_redirect} \nTime Start Transfer: %{time_starttransfer} \nTime Total: %{time_total} \nEffective URL: %{url_effective}\""},
 		},
 	}
 
@@ -86,6 +88,7 @@ func TestDebugAddExtraArgs(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			dc := addExtraArgs(test.DebugCommand)
 			assert.Equal(t, test.ExpectedArguments, dc.Arguments)
+			assert.Equal(t, test.ExpectedExtraArguments, dc.ExtraArguments)
 		})
 	}
 }
